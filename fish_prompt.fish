@@ -19,8 +19,23 @@ function _prompt_color_for_status
   end
 end
 
+function __parse_git_branch -d "Parse current Git branch name"
+  command git symbolic-ref --short HEAD ^/dev/null;
+    or string split '\n' (command git show-ref --head -s --abbrev)[1]
+end
+
+
 function fish_prompt
   set -l last_status $status
+
+  if test -n "$VIRTUAL_ENV"
+    _print_in_color :(basename $VIRTUAL_ENV): yellow
+  end
+
+  set -l is_git_repository (command git rev-parse --is-inside-work-tree ^/dev/null)
+  if test -n "$is_git_repository"
+    _print_in_color /(__parse_git_branch)/ green
+  end
 
   _print_in_color (_pwd_with_tilde) blue
 
