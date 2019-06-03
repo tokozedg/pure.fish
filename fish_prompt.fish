@@ -36,6 +36,17 @@ function fish_prompt
   if test -n "$is_git_repository"
     _print_in_color /(__parse_git_branch)/ green
   end
+  command test -L ./.chef/knife.rb
+  if test $status -eq 0
+    set -l server_name (command grep "^server_name" .chef/knife.rb | awk -F "'" '{print $2 }')
+    if [ "$server_name" = "leaseweb" ]
+      _print_in_color ":staging:" white
+    end
+
+    if [ "$server_name" = "production" ]
+      _print_in_color ":production:" red
+    end
+  end
 
   _print_in_color (_pwd_with_tilde) blue
 
